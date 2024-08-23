@@ -1,0 +1,32 @@
+services:
+  database:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: task-tracker
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    volumes:
+      - ./keycloak/dev:/opt/keycloak/data/import
+    environment:
+      KEYCLOAK_ADMIN: keycloak_admin
+      KEYCLOAK_ADMIN_PASSWORD: keycloak_password
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://database/task-tracker
+      KC_DB_USERNAME: postgres_user
+      KC_DB_PASSWORD: postgres_password
+    ports:
+      - "8000:8080"
+      - "9000:9000"
+    command:
+      - start-dev 
+      - --import-realm
+    depends_on:
+      - database
+
+volumes:
+  pgdata:
